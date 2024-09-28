@@ -1,0 +1,128 @@
+<div class="flex flex-col w-full h-full">
+  <div class="flex flex-col mb-4">
+    <div class="flex">
+      <div class="flex flex-col mx-1">
+        <label class="mb-2 uppercase font-bold text-sm text-gray-500">Search</label>
+        <div class="overflow-hidden">
+          <form phx-change="search">
+            <input
+              class="border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2 px-3 text-gray-800"
+              value={@search}
+              name="search"
+              phx-debounce="2000"
+            />
+          </form>
+        </div>
+      </div>
+      <.link class="mt-7" patch={~p"/emails/new"}>
+        <.button>New Email</.button>
+      </.link>
+    </div>
+  </div>
+
+  <table class="w-full text-left table-auto min-w-max">
+    <thead>
+      <tr>
+        <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+            Action
+          </p>
+        </th>
+        <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+            ID
+          </p>
+        </th>
+        <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+            From Email
+          </p>
+        </th>
+        <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+            To Email
+          </p>
+        </th>
+        <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+            CC
+          </p>
+        </th>
+        <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+            BCC
+          </p>
+        </th>
+        <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+            Subject
+          </p>
+        </th>
+        <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+            Body
+          </p>
+        </th>
+      </tr>
+    </thead>
+    <tbody
+      id="emails"
+      phx-update="stream"
+      phx-viewport-top={@page > 1 && "prev-page"}
+      phx-viewport-bottom={!@end_of_timeline? && "next-page"}
+      phx-page-loading
+    >
+      <tr :for={{id, email} <- @streams.emails} id={id}>
+        <td class="p-4 border-b border-blue-gray-50">
+          <.link class="text-blue-500" patch={~p"/emails/#{email}/edit"}>Edit</.link>
+        </td>
+        <td class="p-4 border-b border-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-normal text-blue-gray-900">
+            <%= email.id %>
+          </p>
+        </td>
+        <td class="p-4 border-b border-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-normal text-blue-gray-900">
+            <%= email.from_email %>
+          </p>
+        </td>
+        <td class="p-4 border-b border-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-normal text-blue-gray-900">
+            <%= email.to_email %>
+          </p>
+        </td>
+        <td class="p-4 border-b border-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-normal text-blue-gray-900">
+            <%= email.cc_email %>
+          </p>
+        </td>
+        <td class="p-4 border-b border-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-normal text-blue-gray-900">
+            <%= email.bcc_email %>
+          </p>
+        </td>
+        <td class="p-4 border-b border-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-normal text-blue-gray-900">
+            <%= email.subject %>
+          </p>
+        </td>
+        <td class="p-4 border-b border-blue-gray-50">
+          <p class="block text-sm antialiased font-normal leading-normal text-blue-gray-900">
+            <%= email.body %>
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<.modal :if={@live_action in [:new, :edit]} id="email-modal" show on_cancel={JS.patch(~p"/emails")}>
+  <.live_component
+    module={MessageStreamWeb.EmailLive.FormComponent}
+    id={@email.id || :new}
+    title={@page_title}
+    action={@live_action}
+    email={@email}
+    patch={~p"/emails"}
+  />
+</.modal>

@@ -1,0 +1,31 @@
+<.header>
+  Email <%= @email.id %>
+  <:subtitle>This is a email record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/emails/#{@email}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit email</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="From email"><%= @email.from_email %></:item>
+  <:item title="To email"><%= @email.to_email %></:item>
+  <:item title="Cc email"><%= @email.cc_email %></:item>
+  <:item title="Bcc email"><%= @email.bcc_email %></:item>
+  <:item title="Subject"><%= @email.subject %></:item>
+  <:item title="Body"><%= @email.body %></:item>
+</.list>
+
+<.back navigate={~p"/emails"}>Back to emails</.back>
+
+<.modal :if={@live_action == :edit} id="email-modal" show on_cancel={JS.patch(~p"/emails/#{@email}")}>
+  <.live_component
+    module={MessageStreamWeb.EmailLive.FormComponent}
+    id={@email.id}
+    title={@page_title}
+    action={@live_action}
+    email={@email}
+    patch={~p"/emails/#{@email}"}
+  />
+</.modal>
